@@ -1,31 +1,52 @@
 package com.shravya.collabapiFrontend.controller;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shravya.collabapiBackend.daoImpl.JobsDaoImpl;
 import com.shravya.collabapiBackend.model.Jobs;
 
 
 @RestController
 public class JobController 
 {
-@RequestMapping("/getJobs")
-public List<Jobs> addJobs()
+	@Autowired
+	JobsDaoImpl jobsDaoImpl;
+@PostMapping("/addJobs")
+public void addJobs(@RequestBody Jobs jobs)
 {
-	Jobs job1=new Jobs();
-	Jobs job2=new Jobs();
-	job1.setJobRole("Developer");
-	job1.setJobDiscription("FrontEnd");
-	job1.setSalary("25000");
-	job2.setJobRole("Developer");
-	job2.setJobDiscription("Backend");
-	job2.setSalary("30000");
-	List<Jobs> list=new ArrayList<Jobs>();
-	list.add(job1);
-	list.add(job2);
+	jobsDaoImpl.addJobs(jobs);
+}
+@RequestMapping("/getJobs")
+public List<Jobs> getAllJobs()
+{
+	List<Jobs> list=jobsDaoImpl.getAllJobs();
 	return list;
 }
+@RequestMapping("/editJob")
+public List<Jobs> applyJob(@RequestParam("jobId") int jobId)
+{
+	System.out.println(jobId);
+	Jobs jobs=jobsDaoImpl.getJob(jobId);
+	jobs.setEnable(true);
+	jobsDaoImpl.editJob(jobs);
+	List<Jobs> list=jobsDaoImpl.getAllJobs();
+	return list;
+}
+
+@RequestMapping("/deleteJob")
+public String deleteJob(@RequestParam("jId") int jobId)
+{
+	Jobs jobs=jobsDaoImpl.getJob(jobId);
+	jobsDaoImpl.deleteJob(jobs);
+  	return "redirect:getJobs";
+}
+
 }
